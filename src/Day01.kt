@@ -7,43 +7,23 @@ fun main() {
         }
     }
 
-    val digits = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
-
-    fun String.findIndicesOfSubstring(string: String): MutableList<Pair<Int, String>> {
-        val result = mutableListOf<Pair<Int, String>>()
-        var index = this.indexOf(string)
-        while (index >= 0) {
-            result.add(Pair(index, string))
-            index = this.indexOf(string, index + 1)
-        }
-        return result
-    }
+    val words = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
 
     fun part2(input: List<String>): Int {
         return input.sumOf { line ->
 
-            var firstDigit = line.firstOrNull { it.isDigit() }
+            val digitPairs = line
+                .mapIndexed { index, c -> Pair(index, c) }
+                .filter { it.second.isDigit() }
 
-            var partToCheck = line.substring(0, if (firstDigit == null) line.count() else line.indexOf(firstDigit))
-            if (partToCheck.isNotEmpty()) {
-                digits.associateBy { partToCheck.indexOf(it) }
-                    .filter { it.key > -1 }
-                    .minByOrNull { it.key }
-                    ?.also {
-                        firstDigit = digits.indexOf(it.value).inc().digitToChar()
-                    }
-            }
+            val wordPairs = words
+                .flatMap { it.toRegex().findAll(line).toList() }
+                .flatMap { it.range.map { index -> Pair(index, words.indexOf(it.value).inc().digitToChar()) } }
 
-            var lastDigit = line.lastOrNull { it.isDigit() }
+            val result = (digitPairs + wordPairs).sortedBy { it.first }
 
-            if (lastDigit != line.last()) {
-                partToCheck = line.substring(if (lastDigit == null) 0 else line.indexOf(lastDigit) + 1)
-
-                digits.flatMap { partToCheck.findIndicesOfSubstring(it) }.maxByOrNull { it.first }?.also {
-                    lastDigit = digits.indexOf(it.second).inc().digitToChar()
-                }
-            }
-
+            val firstDigit = result.first().second
+            val lastDigit = result.last().second
 
             "$firstDigit$lastDigit".toInt()
         }
