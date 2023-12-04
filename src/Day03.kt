@@ -44,15 +44,15 @@ fun main() {
                 val leftBoundary = max(0, it.second - 1)
                 val rightBoundary = min(length, it.second + 1)
 
-                val hitList = mutableListOf<Int>()
-
-                for (i in topBoundary..bottomBoundary) {
-                    for (j in leftBoundary..rightBoundary) {
-                        triples.getByCoordinates(i, j)?.also { hit -> hitList.addLast(hit.third) }
+                val hitList = buildList {
+                    for (i in topBoundary..bottomBoundary) {
+                        for (j in leftBoundary..rightBoundary) {
+                            triples.getByCoordinates(i, j)?.also { hit -> add(hit.third) }
+                        }
                     }
                 }
 
-                hitList.distinct().takeIf { it.size == 2 }?.let { list -> list.fold(1) { a, b -> a * b } }
+                hitList.distinct().takeIf { it.size == 2 }?.reduce(Int::times)
             }
             .filterNotNull()
             .sum()
