@@ -41,10 +41,7 @@ private fun Race.winningWays(): Long {
     val x1 = (time_d - sqrt(time_d * time_d - 4 * distance_d))/2
     val x2 = (time_d + sqrt(time_d * time_d - 4 * distance_d))/2
 
-    val start = if (x1.isRound()) ceil(x1).plus(1) else ceil(x1)
-    val end = if (x2.isRound()) floor(x2).minus(1) else floor(x2)
-
-    return (start.toLong()..end.toLong()).count().toLong()
+    return (floor(x1.plus(1)).toLong()..ceil(x2.minus(1)).toLong()).count().toLong()
 }
 
 
