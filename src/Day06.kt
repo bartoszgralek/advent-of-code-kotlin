@@ -22,6 +22,19 @@ private fun List<String>.parseToRace(): Race {
 
 fun Double.isRound() = this.rem(1).equals(0.0)
 
+/**
+ * Formula for calculating score of given case where
+ * @param T - is time the race lasts
+ * @param D - distance to beat
+ *
+ * is f(x) = (T-x)x
+ * and we are looking for cases where f(x) > D meaning (T-x)x-D > 0
+ * solving for x we got
+ * x1 = (T - sqrt(T^2-4D))/2
+ * x2 = (T + sqrt(T^2-4D))/2
+ *
+ * and within this boundary we count whole numbers
+ */
 private fun Race.winningWays(): Long {
     val time_d = time.toDouble()
     val distance_d = distance.toDouble()
