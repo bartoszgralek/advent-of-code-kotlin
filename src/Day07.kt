@@ -5,14 +5,14 @@ fun main() {
     val cards2 = listOf('J', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'Q', 'K', 'A')
 
     fun String.findRank(): Int {
-        val map = this.toList().associateWith { char -> this.count { it == char } }
+        val map = this.toList().groupingBy { it }.eachCount()
 
         if (map.containsValue(5)) return 7
         if (map.containsValue(4)) return 6
         if (map.containsValue(3) && map.containsValue(2)) return 5
         if (map.containsValue(3)) return 4
         if (map.containsValue(2)) {
-            if (map.filterValues { it == 2 }.size == 2) return 3
+            if (map.count { it.value == 2 } == 2) return 3
             return 2
         }
         return 1
@@ -36,8 +36,10 @@ fun main() {
     fun part2(input: List<String>): Int {
         return input.asSequence().map { it.split(' ') }
             .map { (hand, bet) -> Triple(hand, hand.findPossibleRanks(), bet.toInt()) }
-            .sortedWith(compareBy<Triple<String, Int, Int>> { it.second }.then { o1, o2 -> (o1.first zip o2.first).map { (first, second) -> cards2.indexOf(first) - cards2.indexOf(second) }
-                .firstOrNull { it != 0 } ?: 0 })
+            .sortedWith(compareBy<Triple<String, Int, Int>> { it.second }.then { o1, o2 ->
+                (o1.first zip o2.first).map { (first, second) -> cards2.indexOf(first) - cards2.indexOf(second) }
+                    .firstOrNull { it != 0 } ?: 0
+            })
             .mapIndexed { index, pair -> (index + 1) * pair.third }
             .sum()
     }
