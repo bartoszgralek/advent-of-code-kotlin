@@ -26,3 +26,5 @@ fun Any?.println() = println(this)
 val digitRx = "\\d+".toRegex()
 
 fun String.match(regex: Regex = digitRx): Sequence<MatchResult> = regex.findAll(this)
+
+fun Double.isRound() = this.rem(1).equals(0.0)
