@@ -14,6 +14,15 @@ tasks {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+}
+
 val counterFile = File("src/counter.txt")
 var currentDay = if (counterFile.exists()) counterFile.readText().toInt() else 0
 

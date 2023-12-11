@@ -23,7 +23,7 @@ fun Any?.println() = println(this)
 /**
  * For data parsing
  */
-val digitRx = "\\d+".toRegex()
+val digitRx = "-?\\d+".toRegex()
 
 fun String.match(regex: Regex = digitRx): Sequence<MatchResult> = regex.findAll(this)
 
