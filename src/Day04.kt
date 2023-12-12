@@ -1,29 +1,27 @@
-import kotlin.system.measureTimeMillis
-
 fun main() {
 
     val digitRx = "\\d+".toRegex()
 
-    val cardWorths = mutableMapOf<String, Int>()
+    val memo = hashMapOf<Int, Int>()
 
-    fun cardWorth(card: String?): Int {
-        if (card == null) return 0
-        return cardWorths.computeIfAbsent(card) {
-            val split = card.split(":","|")
-            val winningNumbers = digitRx.findAll(split[1]).map { it.value }.toSet()
-            val numbersYouHave = digitRx.findAll(split[2]).map { it.value }.toSet()
+    fun String.cardWorth(): Int {
+        val split = this.split(":", "|")
+        val winningNumbers = digitRx.findAll(split[1]).map { it.value }.toSet()
+        val numbersYouHave = digitRx.findAll(split[2]).map { it.value }.toSet()
 
-            winningNumbers.count { it in numbersYouHave }
-        }
+        return winningNumbers.count { it in numbersYouHave }
     }
 
     fun countCards(cards: List<String>, index: Int): Int {
-        val worth = cardWorth(cards.getOrNull(index))
-        return 1 + (1..worth).sumOf { countCards(cards, index + it) }
+        if (index > cards.lastIndex) return 0
+        return memo.getOrPut(index) {
+            val worth = cards[index].cardWorth()
+            1 + (1..worth).sumOf { countCards(cards, index + it) }
+        }
     }
 
     fun part1(input: List<String>): Int {
-        return input.sumOf { cardWorth(it) }
+        return input.sumOf { it.cardWorth() }
     }
 
     fun part2(input: List<String>): Int {

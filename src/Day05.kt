@@ -9,11 +9,7 @@ fun main() {
         val range: LongRange
     ) : Comparable<Single> {
         override fun compareTo(other: Single): Int {
-            return when(this.range.first - other.range.first) {
-                in 1..Long.MAX_VALUE -> 1
-                0L -> return 0
-                else -> return -1
-            }
+            return this.range.first.compareTo(other.range.first)
         }
     }
 
@@ -98,8 +94,8 @@ fun main() {
     }
 
     fun part1(input: List<String>): Long {
-        var seeds = digitRx.findAll(input.removeFirst()).toMutableList().map { it.value.toLong() }
-        val mappers = buildMappers(input)
+        var seeds = digitRx.findAll(input.first()).toMutableList().map { it.value.toLong() }
+        val mappers = buildMappers(input.drop(2))
 
         mappers.forEach { mapper ->
             seeds = seeds.map { mapper.map(it) }
@@ -109,12 +105,12 @@ fun main() {
     }
 
     fun part2(input: List<String>): Long {
-        var seeds = digitRx.findAll(input.removeFirst())
+        var seeds = digitRx.findAll(input.first())
             .map { it.value.toLong() }
             .chunked(2)
             .map { (first, length) -> first..<first+length }
             .toList()
-        val mappers = buildMappers(input)
+        val mappers = buildMappers(input.drop(2))
 
         mappers.forEach { mapper ->
             seeds = seeds.flatMap { mapper.map(it) }
@@ -127,6 +123,6 @@ fun main() {
     check(part2(testInput) == 46L)
 
     val input = readInput("Day05")
-    measureTimeMillis { part2(input).println() }.println()
+    measureTimeMillis { part2(input).println() }
 
 }

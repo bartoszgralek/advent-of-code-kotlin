@@ -9,18 +9,21 @@ val compatibilityMap = mapOf(
     '.' to emptyList()
 )
 
+val signLookup = mapOf(
+    Pair('L', 'J') to false,
+    Pair('F', '7') to false,
+    Pair('L', '7') to true,
+    Pair('F', 'J') to true,
+)
+
+val signRx = """[-|LJ7F.S]""".toRegex()
+
 data class Part(var sign: Char, val row: Int, val column: Int) {
 
     fun isConnectedTo(other: Part): Boolean {
         return Pair(other.row - row, other.column - column) in compatibilityMap[this.sign]!!
     }
 }
-
-val signRx = """[-|LJ7F.S]""".toRegex()
-
-const val reset = "\u001B[0m"
-const val green = "\u001B[32m"
-const val bold = "\u001B[1m"
 
 data class Matrix(val data: List<List<Part>>, val start: Part) {
 
@@ -73,8 +76,33 @@ data class Matrix(val data: List<List<Part>>, val start: Part) {
     }
 
     fun countTiles(): Long {
-
-        return 0L
+        return data.sumOf { line ->
+            var isCounting = false
+            var holder: Part? = null
+            line.fold(0L) { acc, part ->
+                when (part.sign) {
+                    '.' -> acc + if (isCounting) 1 else 0
+                    '-' -> acc
+                    '|' -> {
+                        isCounting = !isCounting
+                        acc
+                    }
+                    else -> {
+                        when (holder) {
+                            null -> {
+                                holder = part
+                                acc
+                            }
+                            else -> {
+                                isCounting = isCounting xor signLookup[Pair(holder?.sign, part.sign)]!!
+                                holder = null
+                                acc
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -93,7 +121,9 @@ fun matrixOf(lines: List<String>): Matrix {
 fun main() {
 
     fun part1(input: List<String>): Long {
-        return matrixOf(input).getCycle().size / 2L
+        return matrixOf(input)
+            .getCycle()
+            .size.div(2L)
     }
 
     fun part2(input: List<String>): Long {

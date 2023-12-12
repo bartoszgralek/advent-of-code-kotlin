@@ -1,7 +1,28 @@
+data class Universe(
+    val matrix: List<List<Char>>
+) {
+
+    fun expand(): Universe {
+        return this
+    }
+
+    fun countDistances(): List<Long> {
+        return emptyList()
+    }
+
+    companion object {
+        fun from(list: List<String>): Universe {
+
+
+            return Universe(emptyList())
+        }
+    }
+}
+
 fun main() {
 
     fun part1(input: List<String>): Long {
-        return 0L
+        return Universe.from(input).expand().countDistances().sum()
     }
 
     fun part2(input: List<String>): Long {
