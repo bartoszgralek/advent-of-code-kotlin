@@ -1,8 +1,4 @@
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
 import java.util.LinkedList
-import java.util.PriorityQueue
 
 fun String.evaluate(): List<Int> {
     return damageRx.findAll(this)
@@ -11,17 +7,16 @@ fun String.evaluate(): List<Int> {
         }.toList()
 }
 
-tailrec fun guesses(heap: MutableList<String> = mutableListOf()): MutableList<String> {
-    if (heap.first().indexOf('?') == -1) {
-        return heap
+tailrec fun guesses(queue: LinkedList<String> = LinkedList()): LinkedList<String> {
+    if (queue.first().indexOf('?') == -1) {
+        return queue
     }
-    val element = heap.removeFirst()
-    heap.add(element.replaceFirst('?', '.'))
-    heap.add(element.replaceFirst('?', '#'))
-    return guesses(heap)
+    val element = queue.removeFirst()
+    queue.add(element.replaceFirst('?', '.'))
+    queue.add(element.replaceFirst('?', '#'))
+    return guesses(queue)
 }
-
-fun String.guesses() = guesses(mutableListOf(this))
+fun String.guesses() = guesses(LinkedList<String>().also { it.add(this) })
 
 val damageRx = "#+".toRegex()
 
@@ -29,28 +24,20 @@ val springRx = "[?.#]+".toRegex()
 
 fun main() {
 
-    fun part1(input: List<String>): Long {
-        val springs = input.map { line -> springRx.findAll(line).map { it.value }.first() }
-        val digits = input.map { line -> digitRx.findAll(line).map { it.value.toInt() }.toList() }
-
-        val result = runBlocking {
-            (springs zip digits).map { schema ->
-                async {schema.first.guesses().map { guess -> guess.evaluate() }.count { it == schema.second }.toLong() }
-            }.awaitAll().sum()
-        }
-        return result
-    }
-
     fun part2(input: List<String>): Long {
-        return 0L
+        val springs = input.map { springRx.find(it)?.value?.repeat(5) ?: throw Error() }
+        val digits = input.map { digitRx.findAll(it).map { match -> match.value.toInt() }.toList().let { list ->
+            List(5) { list }.flatten()
+        } }
+
+        return (springs zip digits).sumOf { schema ->
+            println("Starting line for $schema")
+            val result = schema.first.guesses().map { guess -> guess.evaluate() }.count { it == schema.second }.toLong()
+            result
+        }
     }
 
     val testInput = readInput("Day12_test")
-    part1(testInput).println()
-//    check(part1(testInput) == 21L)
-//    check(part2(testInput) == 0L)
-
-    val input = readInput("Day12")
-    part1(input).println()
-//    part2(input).println()
+//    part2(testInput).println()
+    "????????????????????????????????".guesses().size.println()
 }
